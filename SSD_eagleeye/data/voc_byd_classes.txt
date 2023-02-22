@@ -1,0 +1,12 @@
+person
+non_motor_vehicle
+traffic_cone
+pole
+ground_lock_close
+ground_lock_open
+parking_no
+limit_rod
+column
+motor_vehicle
+wheel
+other_obstacles
