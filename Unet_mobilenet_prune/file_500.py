@@ -1,6 +1,7 @@
 import os
 import shutil
 
+# 把图像数据分为300一份
 img_dir = r'D:\data\process_data\save'
 save_dir = r'D:\data\process_data\line_400'
 img_dir_list = os.listdir(img_dir)
