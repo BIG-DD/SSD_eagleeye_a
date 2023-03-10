@@ -1,0 +1,91 @@
+{
+    "name": "parking_slot",
+    "n_gpu": 1,
+
+    "arch": {
+        "type": "UNet",
+        "args": {
+            "backbone": "mobilenetv2",
+            "num_classes": 2,
+            "pretrained_backbone": null
+        }
+    },
+
+	"train_loader": {
+		"type": "SegmentationDataLoader",
+		"args":{
+			"images_folder": "/media/byd/A264AC9264AC6AAD/DataSet/10_25_data/dataset_half/images/train/",
+			"seg_annotations_folder": "/media/byd/A264AC9264AC6AAD/DataSet/10_25_data/dataset_half/ll_seg_annotations/train/",
+			"color_channel": "RGB",
+			"resize": 256,
+			"padding_value": 0,
+			"is_training": true,
+			"noise_std": 3,
+			"crop_range": [0.90, 1.0],
+			"flip_hor": 0.5,
+			"rotate": 0.0,
+			"angle": 10,
+			"normalize": false,
+			"one_hot": false,
+			"shuffle": true,
+			"batch_size": 64,
+			"n_workers": 16,
+			"pin_memory": true
+		}
+	},
+
+	"valid_loader": {
+		"type": "SegmentationDataLoader",
+		"args":{
+			"images_folder": "/media/byd/A264AC9264AC6AAD/DataSet/10_25_data/dataset_half/images/val/",
+			"seg_annotations_folder": "/media/byd/A264AC9264AC6AAD/DataSet/10_25_data/dataset_half/ll_seg_annotations/val/",
+			"color_channel": "RGB",
+			"resize": 256,
+			"padding_value": 0,
+			"is_training": false,
+			"normalize": false,
+			"one_hot": false,
+			"shuffle": false,
+			"batch_size": 64,
+			"n_workers": 16,
+			"pin_memory": true
+		}
+	},
+
+	"optimizer": {
+		"type": "AdamW",
+		"args":{
+			"lr": 1e-3,
+			"eps": 1e-6,
+			"weight_decay": 1e-8
+		}
+	},
+
+	"loss": "OHEM_cross_entropy",
+	"metrics": [
+		"miou"
+	],
+
+	"lr_scheduler": {
+		"type":"CosineAnnealingWarmRestartsLimit",
+		"args":{
+			"T_0": 20,
+			"T_mult": 2,
+			"limit": 1
+		}
+	},
+
+	"trainer": {
+		"epochs": 300,
+		"save_dir": "/media/byd/A264AC9264AC6AAD/DataSet/10_25_data/Unet_runs/pre_train_unet/",
+		"save_freq": null,
+		"verbosity": 2,
+		"monitor": "valid_loss",
+		"monitor_mode": "min"
+	},
+
+	"visualization":{
+		"tensorboardX": true,
+		"log_dir": "/media/byd/A264AC9264AC6AAD/DataSet/10_25_data/Unet_runs/pre_train_unet/"
+	}
+}

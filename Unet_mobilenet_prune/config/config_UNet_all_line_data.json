@@ -1,0 +1,90 @@
+{
+    "name": "parking_slot",
+    "n_gpu": 1,
+    
+    "arch": {
+        "type": "UNet",
+        "args": {
+            "backbone": "mobilenetv2",
+            "num_classes": 2,
+            "pretrained_backbone": null
+        }
+    },
+
+	"train_loader": {
+		"type": "SegmentationDataLoader",
+		"args":{
+			"images_folder": "C:\\DataSet\\all_lane\\dataset\\all_lane\\images\\train\\",
+			"seg_annotations_folder": "C:\\DataSet\\all_lane\\dataset\\all_lane\\ll_seg_annotations\\train\\",
+			"color_channel": "RGB",
+			"resize": 256,
+			"padding_value": 0,
+			"is_training": true,
+			"noise_std": 3,
+			"crop_range": [0.90, 1.0],
+			"flip_hor": 0.5,
+			"rotate": 0.0,
+			"angle": 10,
+			"normalize": false,
+			"one_hot": false,
+			"shuffle": true,
+			"batch_size": 64,
+			"n_workers": 0,
+			"pin_memory": true
+		}
+	},
+
+	"valid_loader": {
+		"type": "SegmentationDataLoader",
+		"args":{
+			"images_folder": "C:\\DataSet\\all_lane\\dataset\\all_lane\\images\\val\\",
+			"seg_annotations_folder": "C:\\DataSet\\all_lane\\dataset\\all_lane\\ll_seg_annotations\\val\\",
+			"color_channel": "RGB",
+			"resize": 256,
+			"padding_value": 0,
+			"is_training": false,
+			"normalize": false,
+			"one_hot": false,
+			"shuffle": false,
+			"batch_size": 64,
+			"n_workers": 0,
+			"pin_memory": true
+		}
+	},
+
+	"optimizer": {
+		"type": "SGD",
+		"args":{
+			"lr": 1e-2,
+			"momentum": 0.9,
+			"weight_decay": 1e-8
+		}
+	},
+
+	"loss": "dice_loss",
+	"metrics": [
+		"miou"
+	],
+
+	"lr_scheduler": {
+		"type":"StepLR",
+		"args":{
+			"step_size": 100,
+			"gamma": 1.0
+		}
+	},
+
+	"trainer": {
+		"epochs": 260,
+		"save_dir": "C:\\DataSet\\all_lane\\dataset\\Unet_runs\\",
+		"save_freq": null,
+		"verbosity": 2,
+		"monitor": "valid_loss",
+		"monitor_mode": "min"
+	},
+
+	"visualization":{
+		"tensorboardX": true,
+		"log_dir": "C:\\DataSet\\all_lane\\dataset\\Unet_runs\\"
+	}
+}
