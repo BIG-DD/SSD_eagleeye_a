@@ -29,6 +29,19 @@ def sparse_mean(sparse_modules):
 
 
 def _compute_polarization_sparsity(sparse_modules: list, lbd, t, alpha, bn_weights_mean):
+	"""
+	计算极化层的loss,loss越小，权重值离权重均值越远。
+	公式：t*|x|-|x-xmean|
+	Args:
+		sparse_modules:
+		lbd:
+		t:
+		alpha:
+		bn_weights_mean:
+
+	Returns:
+
+	"""
 	sparsity_loss = 0
 	for m in sparse_modules:
 		sparsity_term = t * torch.sum(torch.abs(m._conv.weight)) - torch.sum(torch.abs(m._conv.weight - alpha * bn_weights_mean))
@@ -36,9 +49,23 @@ def _compute_polarization_sparsity(sparse_modules: list, lbd, t, alpha, bn_weigh
 	return sparsity_loss
 
 
-def bn_sparsity(model, sparsity=2.5e-5, t=1.0, alpha=0.6):
+def bn_sparsity(model, sparsity:float = 2.5e-5, t=1.0, alpha=0.6):
+	"""
+	计算出极化层的loss值
+	Args:
+		model: 训练时的模型
+		sparsity:
+		t:
+		alpha:
+
+	Returns:极化损失值
+
+	"""
+	# 找到对应的极化层
 	sparse_modules = model.get_sparse_layer()
+	# 找到每层极化层权值的均值
 	sparse_weights_mean = sparse_mean(sparse_modules)
+	# 计算极化层的权重
 	sparse_loss = _compute_polarization_sparsity(sparse_modules, lbd=sparsity, t=t, alpha=alpha, bn_weights_mean=sparse_weights_mean)
 	return sparse_loss
 
@@ -118,6 +145,8 @@ class Trainer(BaseTrainer):
 			self.optimizer.zero_grad()
 			output = self.model(data)
 			loss = self.loss(output, target)
+
+			# 使用polarization剪枝时，需要对特定的层在训练的时候计算loss。
 			sparse_loss = bn_sparsity(self.model)
 			# print('sparse_loss: ', sparse_loss)
 			loss += sparse_loss
